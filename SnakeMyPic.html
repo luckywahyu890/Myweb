@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<style>
+body{
+  background-color: gray;
+}
+#lucky{
+  font-size: 21px;
+}
+
+#result{
+  text-align: center;
+  width:300px;
+  height:350px;
+  border:10px solid black;
+  backg#ffffffround-color: white;
+}
+.kiri{
+  width:70px;
+  height:50px;
+  background-color: bisque;
+  font-size: 32px;
+}
+.kanan:hover{
+  width:70px;
+  height:50px;
+  background-color: yellow;
+  font-size: 29px;
+}
+.bawah:hover{
+  width:70px;
+  height:50px;
+  background-color: yellow;
+  font-size: 29px;
+}
+.atas:hover{
+  width:70px;
+  height:50px;
+  background-color: yellow;
+  font-size: 29px;
+}
+.kiri:hover{
+  width:70px;
+  height:50px;
+  background-color: yellow;
+  font-size: 29px;
+}
+.bawah{
+  width:70px;
+  height:50px;
+  background-color: bisque;
+  font-size: 32px;
+}
+.kanan{
+  width:70px;
+  height:50px;
+  background-color: bisque;
+  font-size: 32px;
+}
+.atas{
+  width:70px;
+  height:50px;
+  background-color: bisque;
+  font-size: 32px;
+}
+
+#reset{
+  
+  width:85px;
+  height:65px;
+  background-color: red;
+  font-size: 50px;
+}
+  #papan{
+    background-color: white;
+    border:3px solid black;
+    width:300px;
+    height:300px;
+    display:grid;
+    grid-template: repeat(10,1fr)/repeat(10,1fr);
+  }
+  #food {
+    background:red;
+    border:2px solid black;
+    background-image:url(apel.jpg);
+    background-size:cover;
+  }
+  #snake {
+    background:green;
+    border:4px solid black;
+    border-radius:8px;
+    background-image:url(LWK.jpg);
+    background-size:cover;
+  }
+  
+  label{
+    font-size: 38px;
+    font-weight: bolder;
+  }
+</style>
+<body>
+  <h1 id="nilai" >Score</h1>
+  <div id="wrap">
+<!--Papan ini akan menjadi food, snake dan papanGame. pada css papan wajib display grid dan grid-template adalah ukuran food dan snake sedangkan width dan height ukuran papanGame-->
+  <div id="papan"></div>
+   
+  
+  <br>
+  <!--class pd tombol akan menjadi parameter untuk menentukan arah-->
+  
+  <div class="btn">
+      <button onclick="ubahArah(this)" class="kiri">⬅️</button>
+      <button onclick="ubahArah(this)" class="kanan">➡️</button>
+      <button onclick="ubahArah(this)" class="bawah">⬇️</button>
+      <button onclick="ubahArah(this)" class="atas">⬆️</button>
+  </div><br>
+  <div id="reward"></div>
+  </div>
+  <div  id="result">
+    <h1 style="background-color:red;color:white;font-family:monospace;" >Yahhh Anda Kalah</h1>
+    <h1 style="background-color:black;color:white;font-family:monospace;" id="nilaiAkir">NILAI KAMU 0 PAYAH</h1>
+    <br>
+    <label>Main lagi</label><br>
+    <button id="reset" onclick="window.location.reload()">🔄</button><br><br><br><br>
+    <h1 id="lucky"> Pembuat Game :<span style=' border: 2px solid black; color:white; background-color:#222'>Lucky_wahyu </span></h1>
+  </div><br><br>
+  
+  <script>
+    result.style.display="none"
+    let papanGame=document.querySelector("#papan");
+    let nilai=document.querySelector("#nilai");
+    let nilaiAkir=document.querySelector("#nilaiAkir");
+    let reward=document.querySelector("#reward");
+    
+let intiGame=()=>{
+  //put snakeEat first
+       snakeEatFood()
+       
+       
+      //jangan letakan makeBodyGood di bwah fungsi createFoodAndSnake akan menganggu fps
+       addSnakeOnArray()
+       snakeGo()
+      //ular akan mati jika menyentuh sumbu x dan y
+       wallAktif()
+       
+       //step awal letakan ini dibawah sendiri
+       createFoodAndSnake();
+    }
+    
+    let foodX ,foodY;
+    let snakeX=5,snakeY=10;
+    let snakeBody=[];
+    
+let createFoodAndSnake=()=>{
+      let li=`<div id="food" style="grid-area: ${foodY} / ${foodX}" ></div>`;
+      for(let i=0;i<snakeBody.length;i++){
+      li+=`<div id="snake" style="grid-area: ${snakeBody[i][1]} / ${snakeBody[i][0]}" ></div>`;}
+      papanGame.innerHTML=li;
+    }
+    
+let addSnakeOnArray=()=>{
+      //running snake smoot
+      for(let i=snakeBody.length-1;i>0;i--){
+        snakeBody[i]=snakeBody[i-1];}
+      snakeBody[0]=[snakeX,snakeY]
+    }
+    
+    let point=0
+let snakeEatFood=()=>{
+      if(snakeX===foodX&&snakeY===foodY){
+        randomFood();
+        snakeBody.push([snakeX,snakeY])
+        point+=10
+        hadiah();
+        nilai.innerHTML=`Score <span style=' border: 2px solid black; color:white; background-color:#222'>${point} </span>`
+        nilaiAkir.innerHTML=`Selamat kamu mendapatkan SCORE <span style=' border: 2px solid black; color:black; background-color:yellow'>${point} </span>`
+      }
+    }
+    
+    //2. random food...gunakan ukuran grid-template untuk merandom dgn baik
+let randomFood=()=>{
+      foodX=Math.floor(Math.random()*10)+1
+      foodY=Math.floor(Math.random()*10)+1
+    }
+    
+    let gameEnd=false;
+let wallAktif=()=>{
+      //dispaly game over
+      if(gameEnd){
+        return displayAkir()
+      }
+      
+      if(snakeX<=0||snakeX>10||snakeY<=0||snakeY>10){
+        return gameEnd=true;}
+    }
+    
+    let moveX=0 ,moveY=0
+let snakeGo=()=>{
+      snakeX+=moveX;
+      snakeY+=moveY;}
+let ubahArah=(e)=>{
+      if(e.classList.contains("kiri")){
+        moveX=-1;
+        moveY=0;}
+      else if(e.classList.contains("atas")){
+        moveX=0;
+        moveY=-1;}
+      else if(e.classList.contains("kanan")){
+        moveX=1;
+        moveY=0;}
+      else if(e.classList.contains("bawah")){
+        moveX=0;
+        moveY=1;}
+      
+    }
+    
+    let stopPapan;
+let hadiah=()=>{
+      reward.style="background-color:yellow;font-family:monospace;font-size:21px"
+      switch(true){
+        case point==20:
+          
+          papan.style="background-image:url(ABC1.jpg);background-size:cover;"
+          
+          break
+        case point==30:
+          
+          papan.style="background-image:url(ABC4.jpg);background-size:cover;"
+          break
+        case point==40:
+          
+          papan.style="background-image:url(ABC2.jpg);background-size:cover;"
+          break
+        case point==50:
+          
+          papan.style="background-image:url(ABC3.jpg);background-size:cover;"
+          break
+        case point==60:
+          
+          papan.style="background-image:url(Zzz.jpg);background-size:cover;"
+          break
+        case point==70:
+          reward.innerHTML="Hebat dah Kamu score kamu 300 ku ubah latar game demi Kamu🥱🥱🥱"
+          papan.style="background-image:url(Lwkteach.jpg);background-size:cover;"
+          break
+        case point==80:
+          reward.innerHTML="Wih Wih....luar Biasa Kamu SCORE KAMU 350 tuhhh 🥱🥱🥱"
+          papan.style="background-image:url(BBB.jpg);background-size:cover;"
+          break
+        case point==400:
+          reward.innerHTML="Aku tidak bisa berkata-kata dehhh Score kamu sudah 400 tuhhh 🥱🥱🥱"
+          papan.style.backgroundColor="fuchsia"
+          break
+        case point==450:
+          reward.innerHTML="Tepuk tangan untuk mu...aku lihat aja kehebatanmu SCORE kamu 450 tuhhh 🥱🥱🥱"
+          papan.style.backgroundColor="teal"
+          break
+        case point==500:
+          reward.innerHTML="Udahlah aku capek nungguin Kamu...da da Sang Juara SCORE kamu 500 tuhhh 📸📸📸💎💎💎💎💎💎💎💎💎💎"
+          papan.style.backgroundColor="purple"
+          break
+        case point==10:
+          
+          papan.style="background-image:url(pantai.jpg);background-size:cover;"
+          
+          break
+        case point==550:
+          reward.innerHTML="Udahlah aku capek nungguin Kamu...da da Sang Juara SCORE diluar nalar tuhhh 📸📸📸💎💎💎💎💎💎💎💎💎💎"
+          stopPapan=setInterval(()=>{papan.style="background-color:pink;box-shadow:0 0 50px yellow;"
+          setTimeout(()=>{papan.style="background-color:pink;box-shadow:0 0 50px white;"
+          },500) },1000)
+          break
+      }
+    }
+    //3. panggil fungsi disini
+let displayAkir=()=>{
+      clearInterval(stopInterval);
+      clearInterval(stopPapan);
+      result.style.display=""
+      wrap.style.display="none"
+      nilai.innerHTML="🥰😍🥰🤓🤓🤓😜🤪😝"
+    }
+    
+    
+    let stopInterval;
+    stopInterval=setInterval(intiGame,130);
+    
+    randomFood()
+    intiGame();
+  </script>
+</body>
+</html>
